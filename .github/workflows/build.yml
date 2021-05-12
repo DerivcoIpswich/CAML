@@ -47,7 +47,7 @@ jobs:
 
     - name: Push to NuGet
       # if: success() && env.PUSH_PACKAGES == 'true'
-      run: dotnet nuget push nupkgs\*.nupkg --source https://api.nuget.org/v3/index.json --api-key ${{secrets.NUGETAPIKEYDSHARP}} --skip-duplicate
+      run: dotnet nuget push nupkgs\*.nupkg --source https://api.nuget.org/v3/index.json --api-key ${{secrets.NUGETAPIKEYCAML}} --skip-duplicate
 
     - name: Archive production artifacts
       uses: actions/upload-artifact@v2
