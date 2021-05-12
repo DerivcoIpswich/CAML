@@ -1,0 +1,56 @@
+name: Build
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+    runs-on: windows-latest
+    # env:
+    #   PUSH_PACKAGES: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' }}
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+
+    - name: Setup .NET Core
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: 3.1.301
+
+    - name: Install GitVersion
+      uses: gittools/actions/gitversion/setup@v0.9.7
+      with:
+        versionSpec: '5.x'
+
+    - name: Determine Version
+      uses: gittools/actions/gitversion/execute@v0.9.7
+
+    - name: Display SemVer
+      run: |
+        echo "Using SemVer: ${{env.GitVersion_FullSemVer}}"
+    - name: Install dependencies
+      run: dotnet restore
+
+    - name: Build
+      run: dotnet build --configuration Release --no-restore
+
+    - name: Test
+      run: dotnet test --no-restore --verbosity normal
+
+    - name: Pack
+      run: dotnet pack --output nupkgs --no-build --configuration Release --verbosity normal /p:Version=${{env.GitVersion_FullSemVer}}
+
+    - name: Push to NuGet
+      # if: success() && env.PUSH_PACKAGES == 'true'
+      run: dotnet nuget push nupkgs\*.nupkg --source https://api.nuget.org/v3/index.json --api-key ${{secrets.NUGETAPIKEYDSHARP}} --skip-duplicate
+
+    - name: Archive production artifacts
+      uses: actions/upload-artifact@v2
+      with:
+        name: packages
+        path: nupkgs\*.nupkg
