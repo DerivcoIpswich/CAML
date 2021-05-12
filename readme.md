@@ -2,6 +2,9 @@
 
 CAML Ain't Markup Language
 
+![build badge](https://github.com/DerivcoIpswich/CAML/actions/workflows/build.yml/badge.svg)
+![stable release badge](https://img.shields.io/github/v/release/DerivcoIpswich/CAML)
+
 ## What does CAML do?
 
 Caml simply adds a layer of conditional logic when deserialising a YAML file.
